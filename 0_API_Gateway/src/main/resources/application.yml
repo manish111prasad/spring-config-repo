@@ -1,0 +1,20 @@
+server:
+  port: 2222
+spring:
+  application:
+    name: cloud-api-Gateway
+
+
+
+
+  cloud:
+    gateway:
+      routes:
+        - id: pussy
+          uri: lb://Pussy         # must match spring.application.name of your service
+          predicates:
+            - Path=/pussy/**      # forward all sub‐paths under /pussy
+
+
+
+          

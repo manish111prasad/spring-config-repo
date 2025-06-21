@@ -1,0 +1,9 @@
+spring:
+  application:
+    name: SBMS_Service_Registry
+server:
+ port: 8761
+ 
+eureka:
+   client:
+     register-with-eureka: false
