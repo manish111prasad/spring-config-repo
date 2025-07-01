@@ -1,0 +1,17 @@
+spring:
+  application:
+    name: Spring_Batch
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    hikari:
+      maximum-pool-size: 20
+    password: manish123
+    url: jdbc:mysql://localhost:3306/spring_batch
+    username: root
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+  batch:
+    jdbc:
+      initialize-schema: always
