@@ -4,10 +4,14 @@ import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
 
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import project.entity.CitizenPlan;
 import project.repo.CitizenPlanRepository;
@@ -18,9 +22,17 @@ public class DataLoader implements ApplicationRunner{
 	@Autowired
 	private CitizenPlanRepository repo;
 	
-
+	@PersistenceContext
+	private EntityManager entityManager;
+	
 	@Override
+	@Transactional
 	public void run(ApplicationArguments args) throws Exception {
+		
+
+		repo.deleteAll();
+		
+		entityManager.createNativeQuery("ALTER TABLE citizen_plans_info  AUTO_INCREMENT = 1").executeUpdate();
 		
 		CitizenPlan c1 = new CitizenPlan();
 		c1.setCitizenName("John");
