@@ -1,0 +1,74 @@
+pipeline {
+  agent any
+
+  tools {
+    jdk 'JDK17'
+    maven 'Maven_3_9'
+  }
+
+  options {
+    ansiColor('xterm')
+    timestamps()
+    buildDiscarder(logRotator(numToKeepStr: '20'))
+  }
+
+  parameters {
+    booleanParam(name: 'BUILD_DOCKER', defaultValue: false, description: 'Also build Docker image')
+  }
+
+  environment {
+    APP_NAME = 'demo-mini'
+  }
+
+  stages {
+    stage('Checkout') {
+      steps {
+        checkout scm
+        sh 'git rev-parse --short HEAD > GIT_SHA.txt || true'
+      }
+    }
+
+    stage('Build & Unit Tests') {
+      steps {
+        sh 'mvn -B -DskipTests=false clean package'
+      }
+      post {
+        always {
+          junit 'target/surefire-reports/*.xml'
+        }
+      }
+    }
+
+    stage('Generate Build Info') {
+      steps {
+        sh 'mvn -B spring-boot:build-info'
+      }
+    }
+
+    stage('Archive Jar') {
+      steps {
+        archiveArtifacts artifacts: 'target/*.jar', fingerprint: true
+      }
+    }
+
+    stage('(Optional) Docker Build') {
+      when { expression { return params.BUILD_DOCKER } }
+      steps {
+        sh '''
+          echo "Skipping real push; sample only"
+          # docker build -t yourrepo/${APP_NAME}:${BUILD_NUMBER} .
+          # docker push yourrepo/${APP_NAME}:${BUILD_NUMBER}
+        '''
+      }
+    }
+  }
+
+  post {
+    success {
+      echo "Build #${env.BUILD_NUMBER} OK for ${env.JOB_NAME}"
+    }
+    failure {
+      echo "Build failed. Check logs."
+    }
+  }
+}
